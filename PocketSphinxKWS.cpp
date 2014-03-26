@@ -8,9 +8,10 @@ using namespace std;
 
 PocketSphinxKWS::PocketSphinxKWS():
 	_ps(nullptr)
-{ }
+{}
 
 PocketSphinxKWS::~PocketSphinxKWS() {
+	// Free PocketSphinx resources.
 	if (_ps != nullptr) {
 		ps_free(_ps);
 	}

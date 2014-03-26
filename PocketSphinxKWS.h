@@ -16,9 +16,11 @@ class PocketSphinxKWS: public KeywordSpotter {
 public:
 	PocketSphinxKWS();
 	~PocketSphinxKWS();
+	// Initialize PocketSphinx with list of keywords specified in a file (only way to send a list of keywords unfortunately).
 	void initialize(cmd_ln_t* config, const std::string& keywordFileName);
+	// Process a buffer of audio to look for keywords.
 	virtual std::string process(std::vector<uint8_t>& buffer);
-
+	// Parse command line parameters into PocketSphinx configuration.
 	static cmd_ln_t* parseConfig(int argc, char* argv[]);
 
 private:
