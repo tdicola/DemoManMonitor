@@ -29,26 +29,8 @@ void AlsaSource::open(const string& hw, const int rate, const int channels, cons
 		throw runtime_error("Failed to open " + string(hw) + " for capture.");
 	}
 	// Set device parameters.
-	snd_pcm_hw_params_t* hwparams;
-	snd_pcm_hw_params_alloca(&hwparams);
-	if (snd_pcm_hw_params_any(_device, hwparams) < 0) {
-		throw runtime_error("Call to snd_pc_hw_params_any failed.");
-	}
-	if (snd_pcm_hw_params_set_access(_device, hwparams, SND_PCM_ACCESS_RW_INTERLEAVED) < 0) {
-		throw runtime_error("Call to snd_pcm_hw_params_set_access failed.");
-	}
-	if (snd_pcm_hw_params_set_rate(_device, hwparams, rate, 0) < 0) {
-		throw runtime_error("Call to snd_pcm_hw_params_set_rate failed.");
-	}
-	if (snd_pcm_hw_params_set_channels(_device, hwparams, channels) < 0) {
-		throw runtime_error("Call to snd_pcm_hw_params_set_channels failed.");
-	}
-	if (snd_pcm_hw_params_set_format(_device, hwparams, format) < 0) {
-		throw runtime_error("Call to snd_pcm_hw_params_set_format failed.");
-	}
-	int result = snd_pcm_hw_params(_device, hwparams);
-	if (result < 0) {
-		throw runtime_error("Error setting device parameters: " + string(snd_strerror(result)));
+	if (snd_pcm_set_params(_device, format, SND_PCM_ACCESS_RW_INTERLEAVED, channels, rate, 1, 100000) < 0) {
+		throw runtime_error("Failed to set device parameters.");
 	}
 	// Save the number of bytes per sample for later buffer calculations.
 	_formatSize = snd_pcm_format_size(format, 1);
