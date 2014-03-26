@@ -24,7 +24,7 @@ void AlsaSink::open(const string& hw, const int rate, const int channels, const 
 	}
 	// Open the device for audio capture.
 	if (snd_pcm_open(&_device, hw.c_str(), SND_PCM_STREAM_PLAYBACK, 0) < 0) {
-		throw runtime_error("Failed to open " + string(hw) + " for capture.");
+		throw runtime_error("Failed to open " + string(hw) + " for playback.");
 	}
 	// Set device parameters.
 	if (snd_pcm_set_params(_device, format, SND_PCM_ACCESS_RW_INTERLEAVED, channels, rate, 1, 100000) < 0) {
