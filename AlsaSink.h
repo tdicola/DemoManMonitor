@@ -6,10 +6,7 @@
 
 #pragma once
 
-#include <cstdint>
 #include <stdexcept>
-#include <string>
-#include <vector>
 
 #include <alsa/asoundlib.h>
 

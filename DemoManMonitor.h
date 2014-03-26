@@ -10,19 +10,20 @@
 #include <vector>
 
 #include "AudioSink.h"
+#include "AudioSource.h"
 #include "KeywordSpotter.h"
 
 class DemoManMonitor {
 public:
-	DemoManMonitor(AudioSink* audioSink,
-		KeywordSpotter* spotter,
-		std::vector<uint8_t>* alarmWav);
+	DemoManMonitor(size_t bufferSize, AudioSource* _audioSource, AudioSink* audioSink, KeywordSpotter* spotter, std::vector<uint8_t>* alarmWav);
 	~DemoManMonitor();
 	void update();
 
 private:
+	AudioSource* _audioSource;
 	AudioSink* _audioSink;
 	KeywordSpotter* _spotter;
 	std::vector<uint8_t>* _alarmWav;
+	std::vector<uint8_t> _buffer;
 
 };

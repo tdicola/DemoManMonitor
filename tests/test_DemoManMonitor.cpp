@@ -1,7 +1,3 @@
-#include <cstdint>
-#include <string>
-#include <vector>
-
 #include "gtest/gtest.h"
 
 #include "DemoManMonitor.h"
@@ -10,30 +6,37 @@
 
 using namespace std;
 
+class MockAudioSource: public AudioSource {
+public:
+	virtual void record(vector<uint8_t>& buffer) {
+	}
+};
+
 class MockAudioSink: public AudioSink {
 public:
-	virtual void playWav(vector<uint8_t>* wav) {
-		playedWav = wav;
+	virtual void play(vector<uint8_t>& buffer) {
+		played = &buffer;
 	}
-	vector<uint8_t>* playedWav;
+	vector<uint8_t>* played;
 };
 
 class MockKeywordSpotter: public KeywordSpotter {
 public:
 	MockKeywordSpotter(const string& keyword): keyword(keyword) {}
 	string keyword;
-	virtual string update() {
+	virtual string process(vector<uint8_t>& buffer) {
 		return keyword;
 	}
 };
 
 TEST(DemoManMonitor, update_plays_wav_when_keyword_spotted) {
+	MockAudioSource audioSource;
 	MockAudioSink audioSink;
 	MockKeywordSpotter spotter("foo");
-	vector<uint8_t> alarmWav;
-	DemoManMonitor monitor(&audioSink, &spotter, &alarmWav);
+	vector<uint8_t> alarm;
+	DemoManMonitor monitor(1, &audioSource, &audioSink, &spotter, &alarm);
 
 	monitor.update();
 
-	ASSERT_EQ(&alarmWav, audioSink.playedWav);
+	ASSERT_EQ(&alarm, audioSink.played);
 }

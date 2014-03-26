@@ -6,10 +6,12 @@
 
 using namespace std;
 
-DemoManMonitor::DemoManMonitor(AudioSink* audioSink, KeywordSpotter* spotter, std::vector<uint8_t>* alarmWav):
+DemoManMonitor::DemoManMonitor(size_t bufferSize, AudioSource* audioSource, AudioSink* audioSink, KeywordSpotter* spotter, std::vector<uint8_t>* alarmWav):
+	_audioSource(audioSource),
 	_audioSink(audioSink), 
 	_spotter(spotter),
-	_alarmWav(alarmWav) 
+	_alarmWav(alarmWav),
+	_buffer(bufferSize)
 {}
 
 DemoManMonitor::~DemoManMonitor() {
@@ -17,9 +19,12 @@ DemoManMonitor::~DemoManMonitor() {
 }
 
 void DemoManMonitor::update() {
-	auto keyword = _spotter->update();
+	// Grab a buffer of audio.
+	_audioSource->record(_buffer);
+	// Look for a keyword.
+	auto keyword = _spotter->process(_buffer);
 	if (keyword != "") {
-		// Keyword was spotted, sound alarm and print ticket.
+		// Keyword was spotted, sound alarm.
 		_audioSink->play(*_alarmWav);
 	}
 }
