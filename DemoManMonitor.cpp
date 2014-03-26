@@ -1,3 +1,7 @@
+// Demolition Man Verbal Morality Statute Monitor
+// Created by Tony DiCola (tony@tonydicola.com)
+// Released under an MIT license (http://opensource.org/licenses/MIT).
+
 #include "DemoManMonitor.h"
 
 using namespace std;
@@ -16,6 +20,6 @@ void DemoManMonitor::update() {
 	auto keyword = _spotter->update();
 	if (keyword != "") {
 		// Keyword was spotted, sound alarm and print ticket.
-		_audioSink->playWav(_alarmWav);
+		_audioSink->play(*_alarmWav);
 	}
 }

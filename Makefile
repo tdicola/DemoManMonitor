@@ -1,4 +1,4 @@
-SOURCES = DemoManMonitor.cpp AlsaSource.cpp
+SOURCES = DemoManMonitor.cpp AlsaSource.cpp AlsaSink.cpp
 OUTPUT = DemoManMonitor
 CXX = g++-4.8
 CXX_FLAGS = -std=c++11 -Wall -Werror
@@ -21,6 +21,9 @@ tests: $(TEST_SOURCES) gtest-all.o gtest_main.o
 AlsaSourceRecorder: $(SOURCES)
 	$(CXX) $(CXX_FLAGS) -I$(PROJECT_DIR) $(SOURCES) ./tests/AlsaSourceRecorder.cpp -o AlsaSourceRecorder $(LIBS)
 
+AlsaSinkPlayer: $(SOURCES)
+	$(CXX) $(CXX_FLAGS) -I$(PROJECT_DIR) $(SOURCES) ./tests/AlsaSinkPlayer.cpp -o AlsaSinkPlayer $(LIBS)
+
 gtest-all.o:
 	$(CXX) $(CXX_FLAGS) -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) -pthread -c $(GTEST_DIR)/src/gtest-all.cc
 
@@ -32,3 +35,4 @@ clean:
 	rm -f testrunner
 	rm -f $(OUTPUT)
 	rm -f AlsaSourceRecorder
+	rm -f AlsaSinkPlayer

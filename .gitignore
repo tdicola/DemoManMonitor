@@ -16,3 +16,4 @@ DemoManMonitor
 testrunner
 *.raw
 AlsaSourceRecorder
+AlsaSinkPlayer

@@ -2,7 +2,7 @@
 // Created by Tony DiCola (tony@tonydicola.com)
 // Released under an MIT license (http://opensource.org/licenses/MIT).
 
-// Interface for a source of audio data.
+// Simple audio recording source interface.
 
 #pragma once
 

@@ -1,3 +1,9 @@
+// Demolition Man Verbal Morality Statute Monitor
+// Created by Tony DiCola (tony@tonydicola.com)
+// Released under an MIT license (http://opensource.org/licenses/MIT).
+
+// Main application.
+
 #pragma once
 
 #include <cstdint>
