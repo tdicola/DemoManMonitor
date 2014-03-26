@@ -18,6 +18,8 @@ public:
 	~AlsaSink();
 	void open(const std::string& hw, const int rate, const int channels, const snd_pcm_format_t format);
 	virtual void play(std::vector<uint8_t>& buffer);
+	virtual void pause();
+	virtual void resume();
 
 private:
 	snd_pcm_t* _device;

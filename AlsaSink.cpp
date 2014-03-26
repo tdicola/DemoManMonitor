@@ -45,3 +45,22 @@ void AlsaSink::play(std::vector<uint8_t>& buffer) {
 		throw runtime_error("Audio buffer underrun!");
 	}
 }
+
+void AlsaSink::pause() {
+	if (_device == nullptr) {
+		throw runtime_error("Device must be open!");
+	}
+	if (snd_pcm_drop(_device) < 0) {
+		throw runtime_error("Call to snd_pcm_drop failed.");
+	}
+}
+
+void AlsaSink::resume() {
+	if (_device == nullptr) {
+		throw runtime_error("Device must be open!");
+	}
+	if (snd_pcm_prepare(_device) < 0) {
+		throw runtime_error("Call to snd_pcm_prepare failed.");
+	}
+}
+

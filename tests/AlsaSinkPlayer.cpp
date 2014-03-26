@@ -37,6 +37,7 @@ int main(int argc, char* argv[]) {
 	}
 	catch (runtime_error ex) {
 		cerr << "ERROR: " << ex.what() << endl;
+		return 1;
 	}
 	return 0;
 }

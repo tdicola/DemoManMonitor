@@ -3,6 +3,7 @@ CXX = g++-4.8
 CXX_FLAGS = -std=c++11 -Wall -Werror
 PROJECT_DIR = .
 GTEST_DIR = $(PROJECT_DIR)/gtest-1.7.0
+MODELS_DIR = ./models
 SOURCES = DemoManMonitor.cpp AlsaSource.cpp AlsaSink.cpp PocketSphinxKWS.cpp
 TEST_SOURCES = ./tests/test_DemoManMonitor.cpp
 LIBS = -lpocketsphinx -lsphinxbase -lsphinxad -lasound
@@ -10,8 +11,11 @@ INCLUDES = -I/usr/local/include/sphinxbase -I/usr/local/include/pocketsphinx
 TEST_INCLUDES = -I$(PROJECT_DIR) -isystem $(GTEST_DIR)/include -I$(GTEST_DIR)
 
 
-main: $(SOURCES) main.cpp
+DemoManMonitor: $(SOURCES) main.cpp
 	$(CXX) $(CXX_FLAGS) $(INCLUDES) $(SOURCES) $(LIBS) main.cpp -o $(OUTPUT)
+
+run: DemoManMonitor
+	./DemoManMonitor -hmm $(MODELS_DIR)/hub4wsj_sc_8k/ -dict $(MODELS_DIR)/cmu07a.dic -lm $(MODELS_DIR)/wsj0vp.5000.DMP
 
 runtests: tests
 	./testrunner

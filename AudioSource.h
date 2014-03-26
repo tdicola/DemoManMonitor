@@ -15,5 +15,8 @@ public:
 	virtual ~AudioSource() {}
 	// Fill the provided byte buffer with audio.
 	virtual void record(std::vector<uint8_t>& buffer) = 0;
-
+	// Stop recording audio.
+	virtual void pause() = 0;
+	// Resume recording audio after stop.
+	virtual void resume() = 0;
 };

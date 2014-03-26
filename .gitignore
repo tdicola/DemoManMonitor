@@ -17,3 +17,6 @@ testrunner
 *.raw
 AlsaSourceRecorder
 AlsaSinkPlayer
+models
+keywords.txt
+

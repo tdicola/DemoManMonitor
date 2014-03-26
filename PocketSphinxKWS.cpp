@@ -42,18 +42,21 @@ std::string PocketSphinxKWS::process(std::vector<uint8_t>& buffer) {
 	ps_process_raw(_ps, (short*)buffer.data(), buffer.size()/2, FALSE, FALSE);
 	// Check if a keyword was spotted.
 	int score = 0;
-	char const* uttid;
-	char const* hyp = ps_get_hyp(_ps, &score, &uttid);
-	if (hyp != nullptr) {
+	const char* uttid;
+	const char* hyp = ps_get_hyp(_ps, &score, &uttid);
+	if (hyp != NULL) {
 		// Found a keyword, reset the utterance and return the keyword.
+		// First copy hypothesis to a string because it will be cleared by starting a new utterance.
+		string keyword(hyp);
 		ps_end_utt(_ps);
 		ps_start_utt(_ps, NULL);
-		return string(hyp);
+		return keyword;
 	}
 	// No keyword spotted.
 	return "";
 }
 
 cmd_ln_t* PocketSphinxKWS::parseConfig(int argc, char* argv[]) {
-	return cmd_ln_parse_r(NULL, NULL, argc, argv, TRUE);
+	arg_t extra[] = { POCKETSPHINX_OPTIONS, CMDLN_EMPTY_OPTION };
+	return cmd_ln_parse_r(NULL, extra, argc, argv, TRUE);
 }
