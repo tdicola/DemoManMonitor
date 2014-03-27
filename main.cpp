@@ -20,7 +20,7 @@
 
 using namespace std;
 
-#define ALARM_FILE		"alarm_trimmed.raw"
+#define ALARM_FILE		"alarm_movie.raw"
 #define RECORD_HW		"plughw:1,0"
 #define PLAYBACK_HW		"plughw:2,0"
 #define KEYWORD_FILE	"keywords.txt"
@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
 
 		// Initialize audio sink and source.
 		AlsaSink sink;
-		sink.open(PLAYBACK_HW, 16000, 1, SND_PCM_FORMAT_S16_LE);
+		sink.open(PLAYBACK_HW, 44100, 1, SND_PCM_FORMAT_S16_LE);
 		AlsaSource source;
 		source.open(RECORD_HW, 16000, 1, SND_PCM_FORMAT_S16_LE);
 

@@ -10,6 +10,8 @@ class MockAudioSource: public AudioSource {
 public:
 	virtual void record(vector<uint8_t>& buffer) {
 	}
+	virtual void pause() {}
+	virtual void resume() {}
 };
 
 class MockAudioSink: public AudioSink {
@@ -18,6 +20,8 @@ public:
 		played = &buffer;
 	}
 	vector<uint8_t>* played;
+	virtual void pause() {}
+	virtual void resume() {}
 };
 
 class MockKeywordSpotter: public KeywordSpotter {
