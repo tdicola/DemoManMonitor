@@ -78,7 +78,29 @@ Adafruit_Thermal::Adafruit_Thermal(int fd) {
 }
 
 Adafruit_Thermal::Adafruit_Thermal(const char* serial) {
-  
+  // Open the serial port.
+  _fd = open(serial, O_RDWR | O_NOCTTY);
+  // Get serial port attributes.
+  termios tty;
+  memset(&tty, 0, sizeof(tty));
+  tcgetattr(_fd, &tty);
+  // Set baud to 19200.
+  cfsetospeed(&tty, (speed_t)B19200);
+  cfsetispeed(&tty, (speed_t)B19200);
+  // Set 8N1.
+  tty.c_cflag &= ~PARENB;
+  tty.c_cflag &= ~CSTOPB;
+  tty.c_cflag &= ~CSIZE;
+  tty.c_cflag |= CS8;
+  // Disable flow control.
+  tty.c_cflag &=  ~CRTSCTS;
+  // Set nonblocking reads and 0.5 second timeout.
+  tty.c_cc[VMIN] = 1;
+  tty.c_cc[VTIME] = 5;
+  tty.c_cflag |= CREAD | CLOCAL;     // turn on READ & ignore ctrl lines
+  cfmakeraw(&tty);
+  tcflush(_fd, TCIFLUSH);
+  tcsetattr(_fd, TCSANOW, &tty);
 }
 
 // The next four helper methods are used when issuing configuration
