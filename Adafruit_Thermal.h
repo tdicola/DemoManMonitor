@@ -71,7 +71,7 @@ class Adafruit_Thermal {
     flush(),
     online(),
     offline(),
-    sleep(),
+    sleepNow(),
     sleepAfter(uint8_t seconds),
     wake(),
 

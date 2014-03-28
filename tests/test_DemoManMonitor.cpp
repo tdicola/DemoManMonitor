@@ -42,5 +42,5 @@ TEST(DemoManMonitor, update_plays_wav_when_keyword_spotted) {
 
 	monitor.update();
 
-	ASSERT_EQ(&alarm, audioSink.played);
+	EXPECT_EQ(&alarm, audioSink.played);
 }
