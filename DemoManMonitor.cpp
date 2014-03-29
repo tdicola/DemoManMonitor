@@ -13,12 +13,12 @@ DemoManMonitor::DemoManMonitor(size_t bufferSize,
 							   AudioSource* audioSource,
 							   AudioSink* audioSink,
 							   KeywordSpotter* spotter,
-							   std::vector<uint8_t>* alarmWav):
+							   std::vector<uint8_t>* alarm):
 	_printer(printer),
 	_audioSource(audioSource),
 	_audioSink(audioSink), 
 	_spotter(spotter),
-	_alarmWav(alarmWav),
+	_alarm(alarm),
 	_buffer(bufferSize),
 	_ticketSteps()
 {
@@ -86,14 +86,19 @@ void DemoManMonitor::raiseAlarm(const std::string& keyword) {
 	// Since the Pi only has one core and timing is somewhat
 	// critical (for smooth audio playback), a tight loop to
 	// update audio and ticket printing state will be executed.
-	bool audioPlaying = false;
+	size_t frame = 0;
 	bool step = 0;
 	// Enable audio playback.
 	_audioSink->resume();
-	while (audioPlaying && step < _ticketSteps.size()) {
+	while (frame < _alarm->size() && step < _ticketSteps.size()) {
 		// Check if audio should be added to the buffer.
-		if (audioPlaying) {
-
+		if (frame < _alarm->size()) {
+			auto available = _audioSink->available();
+			if (available > 0) {
+				size_t toPlay = min(available, _alarm->size() - frame);
+				_audioSink->play(&(_alarm->data()[frame]), toPlay);
+				frame += toPlay;
+			}
 		}
 		// Check if the printer is ready for a new command.
 		if (step < _ticketSteps.size() && _printer->ready()) {

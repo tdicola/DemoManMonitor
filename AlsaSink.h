@@ -18,6 +18,8 @@ public:
 	~AlsaSink();
 	void open(const std::string& hw, const int rate, const int channels, const snd_pcm_format_t format);
 	virtual void play(std::vector<uint8_t>& buffer);
+	virtual void play(uint8_t* buffer, size_t frames);
+	virtual unsigned long available();
 	virtual void pause();
 	virtual void resume();
 

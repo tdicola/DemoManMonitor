@@ -35,15 +35,34 @@ void AlsaSink::open(const string& hw, const int rate, const int channels, const 
 }
 
 void AlsaSink::play(std::vector<uint8_t>& buffer) {
+	// if (_device == nullptr) {
+	// 	throw runtime_error("Device must be open!");
+	// }
+	// // Play audio from buffer.
+	// size_t size = buffer.size() / _formatSize;
+	// size_t played = snd_pcm_writei(_device, buffer.data(), size);
+	// if (played != size) {
+	// 	throw runtime_error("Audio buffer underrun!");
+	// }
+	play(buffer.data(), buffer.size() / _formatSize);
+}
+
+void AlsaSink::play(uint8_t* buffer, size_t frames) {
 	if (_device == nullptr) {
 		throw runtime_error("Device must be open!");
 	}
-	// Play audio from buffer.
-	size_t size = buffer.size() / _formatSize;
-	size_t captured = snd_pcm_writei(_device, buffer.data(), size);
-	if (captured != size) {
+	size_t played = snd_pcm_writei(_device, buffer, frames);
+	if (played != frames) {
 		throw runtime_error("Audio buffer underrun!");
 	}
+}
+
+unsigned long AlsaSink::available() {
+	auto result = snd_pcm_avail(_device);
+	if (result < 0) {
+		throw runtime_error("Call to snd_pcm_avail failed.");
+	}
+	return (unsigned long)result;
 }
 
 void AlsaSink::pause() {

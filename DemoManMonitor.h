@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 #include <functional>
 #include <string>
@@ -23,7 +24,7 @@ public:
 				   AudioSource* audioSource,
 				   AudioSink* audioSink,
 				   KeywordSpotter* spotter,
-				   std::vector<uint8_t>* alarmWav);
+				   std::vector<uint8_t>* alarm);
 	~DemoManMonitor();
 	void update();
 
@@ -35,7 +36,7 @@ private:
 	AudioSource* _audioSource;
 	AudioSink* _audioSink;
 	KeywordSpotter* _spotter;
-	std::vector<uint8_t>* _alarmWav;
+	std::vector<uint8_t>* _alarm;
 	std::vector<uint8_t> _buffer;
 	std::vector<std::function<void(Adafruit_Thermal*)>> _ticketSteps;
 
