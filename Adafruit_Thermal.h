@@ -45,6 +45,7 @@ class Adafruit_Thermal {
 
   Adafruit_Thermal(int fd);
   Adafruit_Thermal(const char* serial);
+  ~Adafruit_Thermal();
 
   void
     begin(int heatTime=200),

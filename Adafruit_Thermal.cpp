@@ -103,6 +103,10 @@ Adafruit_Thermal::Adafruit_Thermal(const char* serial) {
   tcsetattr(_fd, TCSANOW, &tty);
 }
 
+Adafruit_Thermal::~Adafruit_Thermal() {
+  close(_fd);
+}
+
 // The next four helper methods are used when issuing configuration
 // commands, printing bitmaps or barcodes, etc.  Not when printing text.
 

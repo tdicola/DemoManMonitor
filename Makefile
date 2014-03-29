@@ -30,6 +30,9 @@ AlsaSourceRecorder: $(SOURCES)
 AlsaSinkPlayer: $(SOURCES)
 	$(CXX) $(CXX_FLAGS) $(TEST_INCLUDES) $(INCLUDES) $(SOURCES) ./tests/AlsaSinkPlayer.cpp -o AlsaSinkPlayer $(LIBS)
 
+AdafruitThermalTest: $(SOURCES)
+	$(CXX) $(CXX_FLAGS) $(TEST_INCLUDES) $(INCLUDES) $(SOURCES) ./tests/AdafruitThermalTest.cpp -o AdafruitThermalTest $(LIBS)
+
 gtest-all.o:
 	$(CXX) $(CXX_FLAGS) $(TEST_INCLUDES) -pthread -c $(GTEST_DIR)/src/gtest-all.cc
 
@@ -42,3 +45,4 @@ clean:
 	rm -f testrunner
 	rm -f AlsaSourceRecorder
 	rm -f AlsaSinkPlayer
+	rm -f AdafruitThermalTest

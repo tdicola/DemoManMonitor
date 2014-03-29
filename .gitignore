@@ -17,6 +17,7 @@ testrunner
 *.raw
 AlsaSourceRecorder
 AlsaSinkPlayer
+AdafruitThermalTest
 models
 keywords.txt
 

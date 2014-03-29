@@ -33,8 +33,6 @@ TEST(AdafruitThermal, expected_bytes_are_written) {
 	for (size_t i = 0; i < written.size(); ++i) {
 		EXPECT_EQ(written[i], expected[i]);
 	}
-
-	fclose(file);
 }
 
 TEST(AdafruitThermal, writes_delay_for_expected_time) {
@@ -49,6 +47,4 @@ TEST(AdafruitThermal, writes_delay_for_expected_time) {
 
 	unsigned long long exectime = (end.tv_sec - start.tv_sec)*1000000L + (end.tv_usec - start.tv_usec);
 	EXPECT_GE(exectime, 740804);
-
-	fclose(file);
 }
