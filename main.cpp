@@ -22,8 +22,8 @@
 using namespace std;
 
 #define ALARM_FILE		"alarm_movie.raw"
-#define RECORD_HW		"plughw:1,0"
-#define PLAYBACK_HW		"plughw:2,0"
+#define RECORD_HW		"plughw:0,0"
+#define PLAYBACK_HW		"plughw:1,0"
 #define KEYWORD_FILE	"keywords.txt"
 #define PRINTER_PORT	"/dev/ttyACM0"
 
