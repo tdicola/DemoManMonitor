@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 
+#include "Adafruit_Thermal.h"
 #include "DemoManMonitor.h"
 #include "AudioSink.h"
 #include "KeywordSpotter.h"
@@ -34,11 +35,12 @@ public:
 };
 
 TEST(DemoManMonitor, update_plays_wav_when_keyword_spotted) {
+	Adafruit_Thermal printer(fileno(tmpfile()));
 	MockAudioSource audioSource;
 	MockAudioSink audioSink;
 	MockKeywordSpotter spotter("foo");
 	vector<uint8_t> alarm;
-	DemoManMonitor monitor(1, &audioSource, &audioSink, &spotter, &alarm);
+	DemoManMonitor monitor(1, &printer, &audioSource, &audioSink, &spotter, &alarm);
 
 	monitor.update();
 

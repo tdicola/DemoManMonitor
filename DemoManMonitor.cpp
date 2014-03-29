@@ -86,7 +86,7 @@ void DemoManMonitor::raiseAlarm(const std::string& keyword) {
 	// Since the Pi only has one core and timing is somewhat
 	// critical (for smooth audio playback), a tight loop to
 	// update audio and ticket printing state will be executed.
-	bool audioPlaying = true;
+	bool audioPlaying = false;
 	bool step = 0;
 	// Enable audio playback.
 	_audioSink->resume();

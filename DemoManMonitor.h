@@ -28,7 +28,7 @@ public:
 	void update();
 
 private:
-	void setFineSteps();
+	void setTicketSteps();
 	void raiseAlarm(const std::string& keyword);
 
 	Adafruit_Thermal* _printer;
@@ -37,6 +37,6 @@ private:
 	KeywordSpotter* _spotter;
 	std::vector<uint8_t>* _alarmWav;
 	std::vector<uint8_t> _buffer;
-	std::vector<std::function<void, Adafruit_Thermal*>> _ticketSteps;
+	std::vector<std::function<void(Adafruit_Thermal*)>> _ticketSteps;
 
 };
