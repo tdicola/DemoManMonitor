@@ -8,7 +8,11 @@ using namespace std;
 
 AlsaSink::AlsaSink():
 	_device(nullptr),
-	_formatSize(0)
+	_formatSize(0),
+	_chunkSize(0),
+	_playing(nullptr),
+	_pos(0),
+	_frames(0)
 {}
 
 AlsaSink::~AlsaSink() {
@@ -22,8 +26,8 @@ void AlsaSink::open(const string& hw, const int rate, const int channels, const 
 	if (_device != nullptr) {
 		throw runtime_error("Device already open!");
 	}
-	// Open the device for audio capture.
-	if (snd_pcm_open(&_device, hw.c_str(), SND_PCM_STREAM_PLAYBACK, 0) < 0) {
+	// Open the device for audio playback.
+	if (snd_pcm_open(&_device, hw.c_str(), SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK) < 0) {
 		throw runtime_error("Failed to open " + string(hw) + " for playback.");
 	}
 	// Set device parameters.
@@ -32,37 +36,48 @@ void AlsaSink::open(const string& hw, const int rate, const int channels, const 
 	}
 	// Save the number of bytes per sample for later buffer calculations.
 	_formatSize = snd_pcm_format_size(format, 1);
+	// Pick a chunk size for async playback.
+	snd_pcm_uframes_t bufferSize;
+	snd_pcm_uframes_t periodSize;
+	if (snd_pcm_get_params(_device, &bufferSize, &periodSize) < 0) {
+		throw runtime_error("Failed to call snd_pcm_get_params.");
+	}
+	_chunkSize = periodSize;
 }
 
 void AlsaSink::play(std::vector<uint8_t>& buffer) {
-	// if (_device == nullptr) {
-	// 	throw runtime_error("Device must be open!");
-	// }
-	// // Play audio from buffer.
-	// size_t size = buffer.size() / _formatSize;
-	// size_t played = snd_pcm_writei(_device, buffer.data(), size);
-	// if (played != size) {
-	// 	throw runtime_error("Audio buffer underrun!");
-	// }
-	play(buffer.data(), buffer.size() / _formatSize);
+	playAsync(buffer);
+	while (asyncUpdate());
 }
 
-void AlsaSink::play(uint8_t* buffer, size_t frames) {
+void AlsaSink::playAsync(std::vector<uint8_t>& buffer) {
 	if (_device == nullptr) {
 		throw runtime_error("Device must be open!");
 	}
-	size_t played = snd_pcm_writei(_device, buffer, frames);
-	if (played != frames) {
-		throw runtime_error("Audio buffer underrun!");
-	}
+	_playing = buffer.data();
+	_pos = 0;
+	_frames = buffer.size() / _formatSize;
 }
 
-unsigned long AlsaSink::available() {
-	auto result = snd_pcm_avail(_device);
-	if (result < 0) {
-		throw runtime_error("Call to snd_pcm_avail failed.");
+bool AlsaSink::asyncUpdate() {
+	// Check if there is still audio to play.
+	if (_pos < _frames) {
+		// Play either a chunk of frames, or all the remaining frames if less than a chunk.
+		auto toPlay = min(_chunkSize, _frames - _pos);
+		auto written = snd_pcm_writei(_device, _playing + (_pos*_formatSize), toPlay);
+		if (written == -EAGAIN) {
+			// No space in buffer for new frames, keep trying later.
+			return true;
+		}
+		// Update position based on how many frames were played.
+		_pos += written;
+		// Keep playing audio.
+		return true;
 	}
-	return (unsigned long)result;
+	else {
+		// Done playing.
+		return false;
+	}
 }
 
 void AlsaSink::pause() {

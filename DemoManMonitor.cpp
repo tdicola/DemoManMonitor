@@ -86,20 +86,10 @@ void DemoManMonitor::raiseAlarm(const std::string& keyword) {
 	// Since the Pi only has one core and timing is somewhat
 	// critical (for smooth audio playback), a tight loop to
 	// update audio and ticket printing state will be executed.
-	size_t frame = 0;
-	bool step = 0;
-	// Enable audio playback.
+	size_t step = 0;
 	_audioSink->resume();
-	while (frame < _alarm->size() && step < _ticketSteps.size()) {
-		// Check if audio should be added to the buffer.
-		if (frame < _alarm->size()) {
-			auto available = _audioSink->available();
-			if (available > 0) {
-				size_t toPlay = min(available, _alarm->size() - frame);
-				_audioSink->play(&(_alarm->data()[frame]), toPlay);
-				frame += toPlay;
-			}
-		}
+	_audioSink->playAsync(*_alarm);
+	while (_audioSink->asyncUpdate() || step < _ticketSteps.size()) {
 		// Check if the printer is ready for a new command.
 		if (step < _ticketSteps.size() && _printer->ready()) {
 			// Execute the current step and increment to the next one.

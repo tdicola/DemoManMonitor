@@ -1,5 +1,9 @@
 #include "gtest/gtest.h"
 
+#include <algorithm>
+#include <iterator>
+#include <fstream>
+
 #include "Adafruit_Thermal.h"
 #include "DemoManMonitor.h"
 #include "AudioSink.h"
@@ -17,18 +21,16 @@ public:
 
 class MockAudioSink: public AudioSink {
 public:
+	vector<uint8_t> played;
 	virtual void play(vector<uint8_t>& buffer) {
-		played = &buffer;
+		played.clear();
+		copy(begin(buffer), end(buffer), back_inserter(played));
 	}
-	vector<uint8_t>* played;
-	vector<uint8_t> playbuf;
-	virtual void play(uint8_t* buffer, size_t frames) {
-		for (size_t i = 0; i < frames; ++i) {
-			playbuf.push_back(buffer[i]);
-		}
+	virtual void playAsync(std::vector<uint8_t>& buffer) {
+		play(buffer);
 	}
-	virtual unsigned long available() {
-		return 1024;
+	virtual bool asyncUpdate() {
+		return false;
 	}
 	virtual void pause() {}
 	virtual void resume() {}
@@ -44,7 +46,9 @@ public:
 };
 
 TEST(DemoManMonitor, update_plays_alarm_when_keyword_spotted) {
-	Adafruit_Thermal printer(fileno(tmpfile()));
+	auto file = tmpfile();
+	Adafruit_Thermal printer(fileno(file));
+	printer.begin();
 	MockAudioSource audioSource;
 	MockAudioSink audioSink;
 	MockKeywordSpotter spotter("foo");
@@ -53,9 +57,33 @@ TEST(DemoManMonitor, update_plays_alarm_when_keyword_spotted) {
 
 	monitor.update();
 
-	//EXPECT_EQ(&alarm, audioSink.played);
-	EXPECT_EQ(3, audioSink.playbuf.size());
-	for (size_t i = 0; i < audioSink.playbuf.size(); ++i) {
-		EXPECT_EQ(alarm[i], audioSink.playbuf[i]);
+	EXPECT_EQ(3, audioSink.played.size());
+	for (size_t i = 0; i < audioSink.played.size(); ++i) {
+		EXPECT_EQ(alarm[i], audioSink.played[i]);
 	}
+}
+
+TEST(DemoManMonitor, update_prints_ticket_when_keyword_spotted) {
+	auto file = tmpfile();
+	Adafruit_Thermal printer(fileno(file));
+	printer.begin();
+	MockAudioSource audioSource;
+	MockAudioSink audioSink;
+	MockKeywordSpotter spotter("foo");
+	vector<uint8_t> alarm = { 1, 2, 3 };
+	DemoManMonitor monitor(1, &printer, &audioSource, &audioSink, &spotter, &alarm);
+
+	monitor.update();
+
+	// Read data written to printer for verification.
+	rewind(file);
+	vector<uint8_t> written;
+	int c = fgetc(file);
+	while (c != EOF) {
+		written.push_back((uint8_t)c);
+		c = fgetc(file);
+	}
+
+	// Verify something was written.
+	EXPECT_GT(written.size(), 0);
 }

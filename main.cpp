@@ -13,6 +13,7 @@
 #include <iterator>
 #include <vector>
 
+#include "Adafruit_Thermal.h"
 #include "AlsaSink.h"
 #include "AlsaSource.h"
 #include "DemoManMonitor.h"
@@ -24,6 +25,7 @@ using namespace std;
 #define RECORD_HW		"plughw:1,0"
 #define PLAYBACK_HW		"plughw:2,0"
 #define KEYWORD_FILE	"keywords.txt"
+#define PRINTER_PORT	"/dev/ttyACM0"
 
 bool shouldRun = true;
 
@@ -32,6 +34,10 @@ int main(int argc, char* argv[]) {
 	try {
 		// Signal handler to catch ctrl-c in the main loop and shut down gracefully (i.e. call destructors).
 		signal(SIGINT, [](int param){ shouldRun = false; });
+
+		// Initialize printer.
+		Adafruit_Thermal printer(PRINTER_PORT);
+		printer.begin();
 
 		// Load alarm raw audio.
 		ifstream input(ALARM_FILE, ios::in | ios::binary);
@@ -52,9 +58,10 @@ int main(int argc, char* argv[]) {
 		spotter.initialize(PocketSphinxKWS::parseConfig(argc, argv), KEYWORD_FILE);
 
 		// Initialize main logic.
-		DemoManMonitor monitor(8000, &source, &sink, &spotter, &alarm);
+		DemoManMonitor monitor(8000, &printer, &source, &sink, &spotter, &alarm);
 
 		while (shouldRun) {
+			// TODO: Check if switch is flicked with GPIO
 			monitor.update();
 		}
 	}

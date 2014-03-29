@@ -12,12 +12,12 @@
 class AudioSink {
 public:
 	virtual ~AudioSink() {}
-	// Play back the provided buffer of audio.
+	// Play back the provided buffer of audio.  This will block until the audio is played.
 	virtual void play(std::vector<uint8_t>& buffer) = 0;
-	// Play a specified number of frames from the provided buffer.
-	virtual void play(uint8_t* buffer, size_t frames) = 0;
-	// Check how many frames can be played without blocking.
-	virtual unsigned long available() = 0;
+	// Start playback of the provided buffer asyncronously.
+	virtual void playAsync(std::vector<uint8_t>& buffer) = 0;
+	// Called regularly during async playback.  Returns true if there is audio left to play.
+	virtual bool asyncUpdate() = 0;
 	// Stop playing audio.
 	virtual void pause() = 0;
 	// Resume playing audio after stop.

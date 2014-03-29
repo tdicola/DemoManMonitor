@@ -39,21 +39,26 @@
 
 // This method sets the estimated completion time for a just-issued task.
 void Adafruit_Thermal::timeoutSet(unsigned long x) {
-  gettimeofday(&resumeTime, NULL);
-  resumeTime.tv_usec = (resumeTime.tv_usec + x) % 1000000L;
-  resumeTime.tv_sec += (resumeTime.tv_usec + x) / 1000000L;
+  timeval current;
+  gettimeofday(&current, NULL);
+  unsigned long long micros = current.tv_sec * 1000000L + current.tv_usec;
+  micros += x;
+  resumeTime.tv_sec = micros / 1000000L;
+  resumeTime.tv_usec = micros % 1000000L;
 }
 
 // This function waits (if necessary) for the prior task to complete.
 void Adafruit_Thermal::timeoutWait() {
-  timeval current;
-  gettimeofday(&current, NULL);
-  if (resumeTime.tv_sec - current.tv_sec > 0) {
-    sleep(resumeTime.tv_sec - current.tv_sec);
-  }
-  if (resumeTime.tv_usec - current.tv_usec > 0) {
-    usleep(resumeTime.tv_usec - current.tv_usec > 0);
-  }
+  //timeval current;
+  // gettimeofday(&current, NULL);
+  // if (resumeTime.tv_sec - current.tv_sec > 0) {
+  //   sleep(resumeTime.tv_sec - current.tv_sec);
+  // }
+  // if (resumeTime.tv_usec - current.tv_usec > 0) {
+  //   usleep(resumeTime.tv_usec - current.tv_usec > 0);
+  // }
+  // Busy wait while not ready.
+  while (!ready());
 }
 
 // Printer performance may vary based on the power supply voltage,
@@ -75,6 +80,8 @@ void Adafruit_Thermal::setTimes(unsigned long p, unsigned long f) {
 // Constructor
 Adafruit_Thermal::Adafruit_Thermal(int fd) {
   _fd = fd;
+  resumeTime.tv_sec = 0;
+  resumeTime.tv_usec = 0;
 }
 
 Adafruit_Thermal::Adafruit_Thermal(const char* serial) {
@@ -101,6 +108,8 @@ Adafruit_Thermal::Adafruit_Thermal(const char* serial) {
   cfmakeraw(&tty);
   tcflush(_fd, TCIFLUSH);
   tcsetattr(_fd, TCSANOW, &tty);
+  resumeTime.tv_sec = 0;
+  resumeTime.tv_usec = 0;
 }
 
 Adafruit_Thermal::~Adafruit_Thermal() {
@@ -496,8 +505,7 @@ void Adafruit_Thermal::wake() {
 bool Adafruit_Thermal::ready() {
   timeval current;
   gettimeofday(&current, NULL);
-  return ((resumeTime.tv_sec - current.tv_sec <= 0) &&
-          (resumeTime.tv_usec - current.tv_usec <= 0));
+  return (current.tv_sec >= resumeTime.tv_sec && current.tv_usec >= resumeTime.tv_usec);
 }
 
 // Check the status of the paper using the printers self reporting
