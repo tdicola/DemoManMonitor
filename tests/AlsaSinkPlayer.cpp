@@ -32,20 +32,10 @@ int main(int argc, char* argv[]) {
 		input.seekg (0, input.beg);
 		vector<uint8_t> buffer(length);
 		input.read((char*)buffer.data(), length);
-		cout << "Bufsize " << buffer.size() << endl;
 		// Create a 16khz mono device, grab data from stdin, and play it on the audio device.
 		AlsaSink sink;
 		sink.open(argv[1], 16000, 1, SND_PCM_FORMAT_S16_LE);
 		sink.play(buffer);
-		// Send audio data continuously until it's done playing.
-		// size_t pos = 104000;
-		// while (pos < buffer.size()) {
-		// 	auto n = sink.available();
-		// 	cout << "Available " << n << endl;
-		// 	auto toPlay = min(n, buffer.size() - pos);
-		// 	sink.play(buffer.data() + pos, toPlay);
-		// 	pos += toPlay;
-		// }
 	}
 	catch (runtime_error ex) {
 		cerr << "ERROR: " << ex.what() << endl;
