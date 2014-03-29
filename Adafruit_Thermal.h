@@ -102,6 +102,8 @@ class Adafruit_Thermal {
   void print(const char* str);
   void println(const char* str);
 
+  bool ready();
+
  protected:
 
   int _fd;

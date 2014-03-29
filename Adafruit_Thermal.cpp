@@ -492,6 +492,14 @@ void Adafruit_Thermal::wake() {
   }
 }
 
+// Return true if the printer is ready for a command (i.e. call won't block).
+bool Adafruit_Thermal::ready() {
+  timeval current;
+  gettimeofday(&current, NULL);
+  return ((resumeTime.tv_sec - current.tv_sec <= 0) &&
+          (resumeTime.tv_usec - current.tv_usec <= 0));
+}
+
 // Check the status of the paper using the printers self reporting
 // ability. Doesn't match the datasheet...
 // Returns true for paper, false for no paper.
