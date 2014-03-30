@@ -25,7 +25,7 @@ using namespace std;
 #define RECORD_HW		"plughw:0,0"
 #define PLAYBACK_HW		"plughw:1,0"
 #define KEYWORD_FILE	"keywords.txt"
-#define PRINTER_PORT	"/dev/ttyACM0"
+#define PRINTER_PORT	"/dev/ttyAMA0"
 
 bool shouldRun = true;
 
@@ -39,6 +39,8 @@ int main(int argc, char* argv[]) {
 		Adafruit_Thermal printer(PRINTER_PORT);
 		printer.begin();
 
+		cout << "Printer initialized..." << endl;
+
 		// Load alarm raw audio.
 		ifstream input(ALARM_FILE, ios::in | ios::binary);
 		input.seekg (0, input.end);
@@ -47,15 +49,21 @@ int main(int argc, char* argv[]) {
 		vector<uint8_t> alarm(length);
 		input.read((char*)alarm.data(), length);
 
+		cout << "Alarm loaded..." << endl;
+
 		// Initialize audio sink and source.
 		AlsaSink sink;
 		sink.open(PLAYBACK_HW, 44100, 1, SND_PCM_FORMAT_S16_LE);
 		AlsaSource source;
 		source.open(RECORD_HW, 16000, 1, SND_PCM_FORMAT_S16_LE);
 
+		cout << "Sources setup..." << endl;
+
 		// Initialize keyword spotter.
 		PocketSphinxKWS spotter;
 		spotter.initialize(PocketSphinxKWS::parseConfig(argc, argv), KEYWORD_FILE);
+
+		cout << "PocketSphinx setup" << endl;
 
 		// Initialize main logic.
 		DemoManMonitor monitor(8000, &printer, &source, &sink, &spotter, &alarm);
