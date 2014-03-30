@@ -41,23 +41,14 @@
 void Adafruit_Thermal::timeoutSet(unsigned long x) {
   timeval current;
   gettimeofday(&current, NULL);
-  unsigned long long micros = current.tv_sec * 1000000L + current.tv_usec;
-  micros += x;
-  resumeTime.tv_sec = micros / 1000000L;
-  resumeTime.tv_usec = micros % 1000000L;
+  timeval delay;
+  delay.tv_sec = x / 1000000;
+  delay.tv_usec = x % 1000000;
+  timeradd(&current, &delay, &resumeTime);
 }
 
 // This function waits (if necessary) for the prior task to complete.
 void Adafruit_Thermal::timeoutWait() {
-  //timeval current;
-  // gettimeofday(&current, NULL);
-  // if (resumeTime.tv_sec - current.tv_sec > 0) {
-  //   sleep(resumeTime.tv_sec - current.tv_sec);
-  // }
-  // if (resumeTime.tv_usec - current.tv_usec > 0) {
-  //   usleep(resumeTime.tv_usec - current.tv_usec > 0);
-  // }
-  // Busy wait while not ready.
   while (!ready());
 }
 
