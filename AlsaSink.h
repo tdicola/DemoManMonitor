@@ -21,7 +21,6 @@ public:
 	virtual void play(std::vector<uint8_t>& buffer);
 	virtual void playAsync(std::vector<uint8_t>& buffer);
 	virtual bool asyncUpdate();
-	//virtual unsigned long available();
 	virtual void pause();
 	virtual void resume();
 
