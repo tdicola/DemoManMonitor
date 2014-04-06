@@ -75,8 +75,8 @@ bool AlsaSink::asyncUpdate() {
 		return true;
 	}
 	else {
-		// Done playing.
-		return false;
+		// Keep running async update until audio is done playing.
+		return (snd_pcm_state(_device) == SND_PCM_STATE_DRAINING);
 	}
 }
 

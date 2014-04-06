@@ -27,6 +27,7 @@ public:
 				   std::vector<uint8_t>* alarm);
 	~DemoManMonitor();
 	void update();
+	void setQuietMode(bool quietMode);
 
 private:
 	void setTicketSteps();
@@ -39,5 +40,6 @@ private:
 	std::vector<uint8_t>* _alarm;
 	std::vector<uint8_t> _buffer;
 	std::vector<std::function<void(Adafruit_Thermal*)>> _ticketSteps;
+	bool _quietMode;
 
 };

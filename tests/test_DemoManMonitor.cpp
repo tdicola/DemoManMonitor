@@ -57,6 +57,7 @@ TEST(DemoManMonitor, update_plays_alarm_when_keyword_spotted) {
 
 	monitor.update();
 
+	// Verify alarm audio was sent to sink.
 	EXPECT_EQ(3, audioSink.played.size());
 	for (size_t i = 0; i < audioSink.played.size(); ++i) {
 		EXPECT_EQ(alarm[i], audioSink.played[i]);
@@ -86,4 +87,32 @@ TEST(DemoManMonitor, update_prints_ticket_when_keyword_spotted) {
 
 	// Verify something was written.
 	EXPECT_GT(written.size(), 0);
+}
+
+TEST(DemoManMonitor, quiet_mode_does_not_play_audio_or_print_ticket) {
+	auto file = tmpfile();
+	Adafruit_Thermal printer(fileno(file));
+	printer.begin();
+	MockAudioSource audioSource;
+	MockAudioSink audioSink;
+	MockKeywordSpotter spotter("foo");
+	vector<uint8_t> alarm = { 1, 2, 3 };
+	DemoManMonitor monitor(1, &printer, &audioSource, &audioSink, &spotter, &alarm);
+
+	monitor.setQuietMode(true);
+	monitor.update();
+
+	// Read data written to printer for verification.
+	rewind(file);
+	vector<uint8_t> written;
+	int c = fgetc(file);
+	while (c != EOF) {
+		written.push_back((uint8_t)c);
+		c = fgetc(file);
+	}
+
+	// Verify nothing was written to printer.
+	EXPECT_EQ(written.size(), 0);
+	// Verify no alarm audio was sent to sink.
+	EXPECT_EQ(audioSink.played.size(), 0);
 }

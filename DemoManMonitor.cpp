@@ -20,7 +20,8 @@ DemoManMonitor::DemoManMonitor(size_t bufferSize,
 	_spotter(spotter),
 	_alarm(alarm),
 	_buffer(bufferSize),
-	_ticketSteps()
+	_ticketSteps(),
+	_quietMode(false)
 {
 	setTicketSteps();
 }
@@ -80,6 +81,10 @@ void DemoManMonitor::setTicketSteps() {
 }
 
 void DemoManMonitor::raiseAlarm(const std::string& keyword) {
+	// Don't play audio or print ticket while in quiet mode.
+	if (_quietMode) {
+		return;
+	}
 	// Stop audio recording while the alarm is raised.
 	_audioSource->pause();
 	// Play audio and print the ticket at the same time.
@@ -101,4 +106,8 @@ void DemoManMonitor::raiseAlarm(const std::string& keyword) {
 	_audioSink->pause();
 	// Enable recording again.
 	_audioSource->resume();
+}
+
+void DemoManMonitor::setQuietMode(bool quietMode) {
+	_quietMode = quietMode;
 }

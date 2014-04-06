@@ -7,13 +7,13 @@ GTEST_DIR = $(PROJECT_DIR)/gtest-1.7.0
 MODELS_DIR = $(PROJECT_DIR)/models
 SOURCES = DemoManMonitor.cpp AlsaSource.cpp AlsaSink.cpp PocketSphinxKWS.cpp Adafruit_Thermal.cpp
 TEST_SOURCES = $(TESTS_DIR)/test_DemoManMonitor.cpp $(TESTS_DIR)/test_Adafruit_Thermal.cpp
-LIBS = -lpocketsphinx -lsphinxbase -lsphinxad -lasound
+LIBS = -lwiringPi -lpocketsphinx -lsphinxbase -lsphinxad -lasound
 INCLUDES = -I/usr/local/include/sphinxbase -I/usr/local/include/pocketsphinx
 TEST_INCLUDES = -I$(PROJECT_DIR) -isystem $(GTEST_DIR)/include -I$(GTEST_DIR)
 
 
 DemoManMonitor: $(SOURCES) main.cpp
-	$(CXX) $(CXX_FLAGS) $(INCLUDES) $(SOURCES) $(LIBS) main.cpp -o $(OUTPUT)
+	$(CXX) $(CXX_FLAGS) $(INCLUDES) $(SOURCES) main.cpp -o $(OUTPUT) $(LIBS)
 
 run: DemoManMonitor
 	./DemoManMonitor -hmm $(MODELS_DIR)/hub4wsj_sc_8k/ -dict $(MODELS_DIR)/cmu07a.dic -lm $(MODELS_DIR)/wsj0vp.5000.DMP

@@ -13,6 +13,8 @@
 #include <iterator>
 #include <vector>
 
+#include <wiringPi.h>
+
 #include "Adafruit_Thermal.h"
 #include "AlsaSink.h"
 #include "AlsaSource.h"
@@ -24,8 +26,9 @@ using namespace std;
 #define ALARM_FILE		"alarm_movie.raw"
 #define RECORD_HW		"plughw:0,0"
 #define PLAYBACK_HW		"plughw:1,0"
-#define KEYWORD_FILE		"keywords.txt"
-#define PRINTER_PORT		"/dev/ttyAMA0"
+#define KEYWORD_FILE	"keywords.txt"
+#define PRINTER_PORT	"/dev/ttyAMA0"
+#define QUIET_PIN		17
 
 bool shouldRun = true;
 
@@ -34,6 +37,17 @@ int main(int argc, char* argv[]) {
 	try {
 		// Signal handler to catch ctrl-c in the main loop and shut down gracefully (i.e. call destructors).
 		signal(SIGINT, [](int param){ shouldRun = false; });
+
+		// Initialize wiringPi library and quiet switch input.
+		wiringPiSetup () ;
+		pinMode(QUIET_PIN, INPUT);
+		bool quietSwitch = (digitalRead(QUIET_PIN) == HIGH);
+		if (quietSwitch) {
+			cout << "Switch is HIGH!" << endl;
+		}
+		else {
+			cout << "Switch is LOW" << endl;
+		}
 
 		// Initialize printer.
 		Adafruit_Thermal printer(PRINTER_PORT);
@@ -59,9 +73,20 @@ int main(int argc, char* argv[]) {
 
 		// Initialize main logic.
 		DemoManMonitor monitor(8000, &printer, &source, &sink, &spotter, &alarm);
+		monitor.setQuietMode(quietSwitch);
 
 		while (shouldRun) {
-			// TODO: Check if switch is flicked with GPIO
+			bool newQuietSwitch = (digitalRead(QUIET_PIN) == HIGH);
+			if (newQuietSwitch != quietSwitch) {
+				quietSwitch = newQuietSwitch;
+				monitor.setQuietMode(quietSwitch);
+				if (quietSwitch) {
+					cout << "Switch is HIGH!" << endl;
+				}
+				else {
+					cout << "Switch is LOW" << endl;
+				}
+			}
 			monitor.update();
 		}
 	}
