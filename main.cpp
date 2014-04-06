@@ -28,7 +28,7 @@ using namespace std;
 #define PLAYBACK_HW		"plughw:1,0"
 #define KEYWORD_FILE	"keywords.txt"
 #define PRINTER_PORT	"/dev/ttyAMA0"
-#define QUIET_PIN		17
+#define QUIET_PIN		0
 
 bool shouldRun = true;
 
