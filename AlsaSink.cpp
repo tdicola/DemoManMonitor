@@ -75,8 +75,8 @@ bool AlsaSink::asyncUpdate() {
 		return true;
 	}
 	else {
-		// Keep running async update until audio is done playing.
-		return (snd_pcm_state(_device) == SND_PCM_STATE_DRAINING);
+		// Nothing left to play.
+		return false;
 	}
 }
 
@@ -84,8 +84,8 @@ void AlsaSink::pause() {
 	if (_device == nullptr) {
 		throw runtime_error("Device must be open!");
 	}
-	if (snd_pcm_drop(_device) < 0) {
-		throw runtime_error("Call to snd_pcm_drop failed.");
+	if (snd_pcm_drain(_device) < 0) {
+		throw runtime_error("Call to snd_pcm_drain failed.");
 	}
 }
 
