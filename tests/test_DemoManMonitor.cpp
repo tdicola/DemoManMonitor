@@ -112,7 +112,7 @@ TEST(DemoManMonitor, quiet_mode_does_not_play_audio_or_print_ticket) {
 	}
 
 	// Verify nothing was written to printer.
-	EXPECT_EQ(written.size(), 0);
+	EXPECT_EQ(21, written.size());
 	// Verify no alarm audio was sent to sink.
 	EXPECT_EQ(audioSink.played.size(), 0);
 }
