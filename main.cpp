@@ -16,6 +16,7 @@
 #include <wiringPi.h>
 
 #include "Adafruit_Thermal.h"
+#include "AlsaError.h"
 #include "AlsaSink.h"
 #include "AlsaSource.h"
 #include "DemoManMonitor.h"
@@ -23,7 +24,7 @@
 
 using namespace std;
 
-#define ALARM_FILE		"alarm_movie.raw"
+#define ALARM_FILE		"alarm_movie_padded.raw"
 #define RECORD_HW		"plughw:0,0"
 #define PLAYBACK_HW		"plughw:1,0"
 #define KEYWORD_FILE	"keywords.txt"
@@ -32,9 +33,21 @@ using namespace std;
 
 bool shouldRun = true;
 
+void setQuietMode(DemoManMonitor& monitor, bool quietMode) {
+	monitor.setQuietMode(quietMode);
+	if (quietMode) {
+		cout << "Quiet mode enabled." << endl;
+	}
+	else {
+		cout << "Quiet mode disabled." << endl;
+	}
+}
+
 int main(int argc, char* argv[]) {
-	cout << "Demolition Man Verbal Morality Statute Monitor" << endl;
 	try {
+		cout << "Demolition Man Verbal Morality Statute Monitor" << endl;
+		cout << "Loading..." << endl;
+
 		// Signal handler to catch ctrl-c in the main loop and shut down gracefully (i.e. call destructors).
 		signal(SIGINT, [](int param){ shouldRun = false; });
 
@@ -42,12 +55,6 @@ int main(int argc, char* argv[]) {
 		wiringPiSetup () ;
 		pinMode(QUIET_PIN, INPUT);
 		bool quietSwitch = (digitalRead(QUIET_PIN) == HIGH);
-		if (quietSwitch) {
-			cout << "Switch is HIGH!" << endl;
-		}
-		else {
-			cout << "Switch is LOW" << endl;
-		}
 
 		// Initialize printer.
 		Adafruit_Thermal printer(PRINTER_PORT);
@@ -73,24 +80,26 @@ int main(int argc, char* argv[]) {
 
 		// Initialize main logic.
 		DemoManMonitor monitor(8000, &printer, &source, &sink, &spotter, &alarm);
-		monitor.setQuietMode(quietSwitch);
+		setQuietMode(monitor, quietSwitch);
+
+		cout << "Listening... (press Ctrl-C to stop)" << endl;
 
 		while (shouldRun) {
+			// Check quite mode switch and update state.
 			bool newQuietSwitch = (digitalRead(QUIET_PIN) == HIGH);
 			if (newQuietSwitch != quietSwitch) {
 				quietSwitch = newQuietSwitch;
-				monitor.setQuietMode(quietSwitch);
-				if (quietSwitch) {
-					cout << "Switch is HIGH!" << endl;
-				}
-				else {
-					cout << "Switch is LOW" << endl;
-				}
+				setQuietMode(monitor, quietSwitch);
 			}
+			// Update main logic state.
 			monitor.update();
 		}
 	}
-	catch (runtime_error ex) {
+	catch (AlsaError ex) {
+		cerr << "ALSA ERROR " << ex.message << " (" << ex.code << ") while calling: " << ex.what() << endl;
+		return 1;
+	}
+	catch (exception ex) {
 		cerr << "ERROR: " << ex.what() << endl;
 		return 1;
 	}

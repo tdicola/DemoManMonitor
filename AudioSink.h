@@ -9,6 +9,8 @@
 #include <cstdint>
 #include <vector>
 
+#include "AlsaError.h"
+
 class AudioSink {
 public:
 	virtual ~AudioSink() {}

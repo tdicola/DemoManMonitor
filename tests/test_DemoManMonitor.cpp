@@ -13,7 +13,8 @@ using namespace std;
 
 class MockAudioSource: public AudioSource {
 public:
-	virtual void record(vector<uint8_t>& buffer) {
+	virtual bool record(vector<uint8_t>& buffer) {
+		return true;
 	}
 	virtual void pause() {}
 	virtual void resume() {}

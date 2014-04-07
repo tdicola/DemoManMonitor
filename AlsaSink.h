@@ -11,6 +11,7 @@
 
 #include <alsa/asoundlib.h>
 
+#include "AlsaError.h"
 #include "AudioSink.h"
 
 class AlsaSink: public AudioSink {

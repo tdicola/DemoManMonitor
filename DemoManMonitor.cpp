@@ -31,13 +31,19 @@ DemoManMonitor::~DemoManMonitor()
 
 void DemoManMonitor::update() {
 	// Grab a buffer of audio.
-	_audioSource->record(_buffer);
-	// Look for a keyword.
-	string keyword = _spotter->process(_buffer);
-	if (keyword != "") {
-		// Keyword was spotted, sound alarm.
-		cout << "==== KEYWORD SPOTTED: " << keyword << endl;
-		raiseAlarm(keyword);
+	if (_audioSource->record(_buffer)) {
+		// Look for a keyword.
+		string keyword = _spotter->process(_buffer);
+		if (keyword != "") {
+			// Keyword was spotted, sound alarm.
+			cout << "KEYWORD SPOTTED: " << keyword << endl;
+			raiseAlarm(keyword);
+		}
+	}
+	else {
+		// There was a problem getting data from the microphone.
+		// Print an error and try again with next update.
+		cerr << "Failed to get a full buffer of microphone data!" << endl;
 	}
 }
 
@@ -94,13 +100,15 @@ void DemoManMonitor::raiseAlarm(const std::string& keyword) {
 	size_t step = 0;
 	_audioSink->resume();
 	_audioSink->playAsync(*_alarm);
-	while (_audioSink->asyncUpdate() || step < _ticketSteps.size()) {
+	bool playing = _audioSink->asyncUpdate();
+	while (playing || step < _ticketSteps.size()) {
 		// Check if the printer is ready for a new command.
 		if (step < _ticketSteps.size() && _printer->ready()) {
 			// Execute the current step and increment to the next one.
 			_ticketSteps[step](_printer);
 			step++;
 		}
+		playing = _audioSink->asyncUpdate();
 	}
 	// Stop audio playback.
 	_audioSink->pause();
