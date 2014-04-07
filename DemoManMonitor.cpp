@@ -5,6 +5,7 @@
 #include "DemoManMonitor.h"
 
 #include <iostream>
+#include <unistd.h>
 
 using namespace std;
 
@@ -100,7 +101,7 @@ void DemoManMonitor::raiseAlarm(const std::string& keyword) {
 	size_t step = 0;
 	_audioSink->resume();
 	_audioSink->playAsync(*_alarm);
-	bool playing = _audioSink->asyncUpdate();
+	bool playing = true;
 	while (playing || step < _ticketSteps.size()) {
 		// Check if the printer is ready for a new command.
 		if (step < _ticketSteps.size() && _printer->ready()) {
