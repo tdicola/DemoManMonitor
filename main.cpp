@@ -30,6 +30,7 @@ using namespace std;
 #define KEYWORD_FILE	"keywords.txt"
 #define PRINTER_PORT	"/dev/ttyAMA0"
 #define QUIET_PIN		0
+#define LED_PIN			4
 
 bool shouldRun = true;
 
@@ -55,6 +56,9 @@ int main(int argc, char* argv[]) {
 		wiringPiSetup () ;
 		pinMode(QUIET_PIN, INPUT);
 		bool quietSwitch = (digitalRead(QUIET_PIN) == HIGH);
+
+		pinMode(LED_PIN, OUTPUT);
+		digitalWrite(LED_PIN, HIGH);
 
 		// Initialize printer.
 		Adafruit_Thermal printer(PRINTER_PORT);
@@ -94,6 +98,8 @@ int main(int argc, char* argv[]) {
 			// Update main logic state.
 			monitor.update();
 		}
+
+		digitalWrite(LED_PIN, LOW);
 	}
 	catch (AlsaError ex) {
 		cerr << "ALSA ERROR " << ex.message << " (" << ex.code << ") while calling: " << ex.what() << endl;
