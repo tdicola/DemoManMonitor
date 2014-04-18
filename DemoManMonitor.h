@@ -24,7 +24,8 @@ public:
 				   AudioSource* audioSource,
 				   AudioSink* audioSink,
 				   KeywordSpotter* spotter,
-				   std::vector<uint8_t>* alarm);
+				   std::vector<uint8_t>* alarm,
+				   std::function<void(bool enable)> light);
 	~DemoManMonitor();
 	void update();
 	void setQuietMode(bool quietMode);
@@ -41,5 +42,6 @@ private:
 	std::vector<uint8_t> _buffer;
 	std::vector<std::function<void(Adafruit_Thermal*)>> _ticketSteps;
 	bool _quietMode;
+	std::function<void(bool enable)> _light;
 
 };

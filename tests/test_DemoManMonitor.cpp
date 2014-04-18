@@ -54,7 +54,7 @@ TEST(DemoManMonitor, update_plays_alarm_when_keyword_spotted) {
 	MockAudioSink audioSink;
 	MockKeywordSpotter spotter("foo");
 	vector<uint8_t> alarm = { 1, 2, 3 };
-	DemoManMonitor monitor(1, &printer, &audioSource, &audioSink, &spotter, &alarm);
+	DemoManMonitor monitor(1, &printer, &audioSource, &audioSink, &spotter, &alarm, [](bool enable){});
 
 	monitor.update();
 
@@ -73,7 +73,7 @@ TEST(DemoManMonitor, update_prints_ticket_when_keyword_spotted) {
 	MockAudioSink audioSink;
 	MockKeywordSpotter spotter("foo");
 	vector<uint8_t> alarm = { 1, 2, 3 };
-	DemoManMonitor monitor(1, &printer, &audioSource, &audioSink, &spotter, &alarm);
+	DemoManMonitor monitor(1, &printer, &audioSource, &audioSink, &spotter, &alarm, [](bool enable){});
 
 	monitor.update();
 
@@ -98,7 +98,7 @@ TEST(DemoManMonitor, quiet_mode_does_not_play_audio_or_print_ticket) {
 	MockAudioSink audioSink;
 	MockKeywordSpotter spotter("foo");
 	vector<uint8_t> alarm = { 1, 2, 3 };
-	DemoManMonitor monitor(1, &printer, &audioSource, &audioSink, &spotter, &alarm);
+	DemoManMonitor monitor(1, &printer, &audioSource, &audioSink, &spotter, &alarm, [](bool enable){});
 
 	monitor.setQuietMode(true);
 	monitor.update();
@@ -116,4 +116,31 @@ TEST(DemoManMonitor, quiet_mode_does_not_play_audio_or_print_ticket) {
 	EXPECT_EQ(21, written.size());
 	// Verify no alarm audio was sent to sink.
 	EXPECT_EQ(audioSink.played.size(), 0);
+}
+
+TEST(DemoManMonitor, light_is_enabled_and_disabled_when_keyword_spotted) {
+	auto file = tmpfile();
+	Adafruit_Thermal printer(fileno(file));
+	printer.begin();
+	MockAudioSource audioSource;
+	MockAudioSink audioSink;
+	MockKeywordSpotter spotter("foo");
+	vector<uint8_t> alarm = { 1, 2, 3 };
+	bool lightEnabled = false;
+	bool lightDisabled = false;
+
+	DemoManMonitor monitor(1, &printer, &audioSource, &audioSink, &spotter, &alarm, [&lightEnabled, &lightDisabled](bool enabled){
+		if (enabled) {
+			lightEnabled = true;
+		}
+		else {
+			lightDisabled = true;
+		}
+	});
+
+	monitor.update();
+
+	// Verify light enabld and disabled.
+	EXPECT_TRUE(lightEnabled);
+	EXPECT_TRUE(lightDisabled);
 }

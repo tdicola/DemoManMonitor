@@ -14,7 +14,8 @@ DemoManMonitor::DemoManMonitor(size_t bufferSize,
 							   AudioSource* audioSource,
 							   AudioSink* audioSink,
 							   KeywordSpotter* spotter,
-							   std::vector<uint8_t>* alarm):
+							   std::vector<uint8_t>* alarm,
+							   std::function<void(bool enable)> light):
 	_printer(printer),
 	_audioSource(audioSource),
 	_audioSink(audioSink), 
@@ -22,7 +23,8 @@ DemoManMonitor::DemoManMonitor(size_t bufferSize,
 	_alarm(alarm),
 	_buffer(bufferSize),
 	_ticketSteps(),
-	_quietMode(false)
+	_quietMode(false),
+	_light(light)
 {
 	setTicketSteps();
 }
@@ -92,6 +94,8 @@ void DemoManMonitor::raiseAlarm(const std::string& keyword) {
 	if (_quietMode) {
 		return;
 	}
+	// Turn the light on.
+	_light(true);
 	// Stop audio recording while the alarm is raised.
 	_audioSource->pause();
 	// Play audio and print the ticket at the same time.
@@ -115,6 +119,8 @@ void DemoManMonitor::raiseAlarm(const std::string& keyword) {
 	_audioSink->pause();
 	// Enable recording again.
 	_audioSource->resume();
+	// Turn the light off.
+	_light(false);
 }
 
 void DemoManMonitor::setQuietMode(bool quietMode) {

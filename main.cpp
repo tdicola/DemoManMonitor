@@ -44,6 +44,10 @@ void setQuietMode(DemoManMonitor& monitor, bool quietMode) {
 	}
 }
 
+void light(bool enable) {
+	digitalWrite(LED_PIN, enable ? HIGH : LOW);
+}
+
 int main(int argc, char* argv[]) {
 	try {
 		cout << "Demolition Man Verbal Morality Statute Monitor" << endl;
@@ -83,7 +87,7 @@ int main(int argc, char* argv[]) {
 		spotter.initialize(PocketSphinxKWS::parseConfig(argc, argv), KEYWORD_FILE);
 
 		// Initialize main logic.
-		DemoManMonitor monitor(8000, &printer, &source, &sink, &spotter, &alarm);
+		DemoManMonitor monitor(8000, &printer, &source, &sink, &spotter, &alarm, light);
 		setQuietMode(monitor, quietSwitch);
 
 		cout << "Listening... (press Ctrl-C to stop)" << endl;
