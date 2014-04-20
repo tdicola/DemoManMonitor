@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
 		bool quietSwitch = (digitalRead(QUIET_PIN) == HIGH);
 
 		pinMode(LED_PIN, OUTPUT);
-		digitalWrite(LED_PIN, HIGH);
+		digitalWrite(LED_PIN, LOW);
 
 		// Initialize printer.
 		Adafruit_Thermal printer(PRINTER_PORT);
